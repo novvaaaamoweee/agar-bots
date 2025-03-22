@@ -1,0 +1,29 @@
+const SERVER = "wss://your-private-server"; // 🔹 Replace with your private Agar.io server
+
+// Function to create a bot
+function createBot() {
+    let ws = new WebSocket(SERVER);
+
+    ws.onopen = function() {
+        console.log("[BOT] Connected!");
+        ws.send(new Uint8Array([254, 5, 0, 0, 0])); // Join packet
+    };
+
+    ws.onmessage = function(event) {
+        console.log("[BOT] Data received:", new Uint8Array(event.data));
+    };
+
+    function moveBot(x, y) {
+        let movePacket = new Uint8Array([16, 0, 0, 0, x, y]);
+        ws.send(movePacket);
+    }
+
+    setInterval(() => {
+        moveBot(Math.random() * 1000, Math.random() * 1000); // Random movement
+    }, 1000);
+}
+
+// Create multiple bots
+for (let i = 0; i < 5; i++) { // 🔹 Adjust bot count
+    setTimeout(createBot, i * 500);
+}
