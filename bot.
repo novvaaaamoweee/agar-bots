@@ -1,29 +1,42 @@
-const SERVER = "wss://your-private-server"; // 🔹 Replace with your private Agar.io server
+// bot.js - Advanced Agar.io Bot
+(function () {
+    console.log("✅ Bot script loaded!");
 
-// Function to create a bot
-function createBot() {
-    let ws = new WebSocket(SERVER);
+    let myCell = null;  // Your cell
+    let bots = [];       // List of bots
 
-    ws.onopen = function() {
-        console.log("[BOT] Connected!");
-        ws.send(new Uint8Array([254, 5, 0, 0, 0])); // Join packet
-    };
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "B") {
+            alert("Bots Activated! 🤖");
+            startBots();
+        }
+    });
 
-    ws.onmessage = function(event) {
-        console.log("[BOT] Data received:", new Uint8Array(event.data));
-    };
-
-    function moveBot(x, y) {
-        let movePacket = new Uint8Array([16, 0, 0, 0, x, y]);
-        ws.send(movePacket);
+    function startBots() {
+        console.log("🚀 Bots are running...");
+        setInterval(() => {
+            if (myCell) {
+                bots.forEach(bot => moveBotTo(myCell.x, myCell.y));
+            }
+        }, 500);
     }
 
-    setInterval(() => {
-        moveBot(Math.random() * 1000, Math.random() * 1000); // Random movement
-    }, 1000);
-}
+    function moveBotTo(x, y) {
+        let event = new MouseEvent("mousemove", {
+            clientX: x,
+            clientY: y,
+            bubbles: true,
+        });
+        document.dispatchEvent(event);
+    }
 
-// Create multiple bots
-for (let i = 0; i < 5; i++) { // 🔹 Adjust bot count
-    setTimeout(createBot, i * 500);
-}
+    function detectMyCell() {
+        let allCells = document.querySelectorAll("canvas"); // Find game cells
+        if (allCells.length > 0) {
+            myCell = { x: window.innerWidth / 2, y: window.innerHeight / 2 }; // Approximate center
+            console.log("📍 My Cell Detected:", myCell);
+        }
+    }
+
+    setInterval(detectMyCell, 1000);
+})();
